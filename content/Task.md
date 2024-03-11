@@ -135,6 +135,11 @@ put username admin and password given by the above command and we are welcomed w
 	**A canary rollout is a deployment strategy where the operator releases a new version of their application to a small percentage of the production traffic.**
 		
 	Hence first we release new version to 20% of traffic and then we promote little by little. 
+	Here the major things are 
+		- setweight
+		- duration
+		- promote
+		- abort
 		
 
     
@@ -144,6 +149,9 @@ put username admin and password given by the above command and we are welcomed w
 		
     
 3. Monitor the Rollout: Use Argo Rollouts to monitor the deployment of the new version, ensuring the canary release successfully completes.
+		There are two ways to monitor argo rollouts one is through cli by using the command
+		`kubectl argo rollouts get rollout nodejs-app-rollout --watch`
+		and other way is through dashboard that is accessible at https://localhost:3100
 
 ### Task 4: Cleanup
 
