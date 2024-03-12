@@ -135,7 +135,7 @@ put username admin and password given by the above command and we are welcomed w
 	**A canary rollout is a deployment strategy where the operator releases a new version of their application to a small percentage of the production traffic.**
 		
 	Hence first we release new version to 20% of traffic and then we promote little by little. 
-	Here the major things are 
+	Here the major things to take care are 
 		- setweight
 		- duration
 		- promote
@@ -144,16 +144,37 @@ put username admin and password given by the above command and we are welcomed w
 
     
 2. Trigger a Rollout: Make a change to the application, update the Docker image, push the new version to your registry, and update the rollout definition to use this new image.
-		As we have changed our web app and created another image called node-todo-app-2 we will update the rollout definition.
-		![[Pasted image 20240310125329.png]]
+Below given is the initial state 
+
+![[Pasted image 20240312185104.png]]
+![[Pasted image 20240312185355.png]]
+
+Initially we used csborle/node-todo-app image and deployed the rollout it gets deployed similar to a deployment but as we change the image to csborle/node-todo-app-2  using the command
+
+kubectl argo rollouts set image node-todo \
+  node-todo=csborle/node-todo-app-2
+
+![[Pasted image 20240312190337.png]]
+![[Pasted image 20240312190506.png]]
+Here the rollout is paused but as the duration is not given it will be in the same state till we don't promote hence we run the promote command and eventually our new image is scales up and is marked as healthy and the older containers are terminated and scaled down.
+
+![[Pasted image 20240312191748.png]]
+![[Pasted image 20240312191753.png]]
+		
+		
 		
     
 3. Monitor the Rollout: Use Argo Rollouts to monitor the deployment of the new version, ensuring the canary release successfully completes.
 		There are two ways to monitor argo rollouts one is through cli by using the command
 		`kubectl argo rollouts get rollout nodejs-app-rollout --watch`
-		and other way is through dashboard that is accessible at https://localhost:3100
+	![[Pasted image 20240312191748.png]]
+		
+and other way is through dashboard that is accessible at https://localhost:3100
+![[Pasted image 20240312191753.png]]
 
 ### Task 4: Cleanup
+
+For ArgoCD, go to the dashboard, we can just click delete the application button. and all the resources are deleted and our cluster is cleaned.
 
 We clean up the cluster by following the below steps
 First we get all resources from the respective namespace
