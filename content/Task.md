@@ -1,4 +1,5 @@
 ### Task 1: Setup and Configuration
+#setup
 
 1. **Create a GitRepository: Create a Github repository and host your source code in the same repository.**
 
@@ -61,8 +62,9 @@ put username admin and password given by the above command and we are welcomed w
     
 
 ### Task 2: Creating the GitOps Pipeline
+#pipeline
 
-1. Dockerize the Application: Build a Docker image for the provided web application and push it to a public container registry of your choice.
+1. **Dockerize the Application: Build a Docker image for the provided web application and push it to a public container registry of your choice.**
 
 	In order to create docker image first we go into folder where Dockerfile is located
 
@@ -95,13 +97,15 @@ put username admin and password given by the above command and we are welcomed w
 	![[Pasted image 20240309090014.png]]
 
     
-2. Deploy the Application Using Argo CD:
+2. **Deploy the Application Using Argo CD:**
     
 
 - Modify the Kubernetes manifests in your forked repository to use the Docker image you pushed.
 		We have added deployment and service files in manifest in github
     
 - Set up Argo CD to monitor your repository and automatically deploy changes to your Kubernetes cluster.
+
+
 
 	By using this Dashboard we monitor the deployment, we can see the application is deployed successfully and 3 replicas are created.
 	![[Pasted image 20240307195040.png]]
@@ -129,8 +133,9 @@ put username admin and password given by the above command and we are welcomed w
 
 
 ### Task 3: Implementing a Canary Release with Argo Rollouts
+#rollouts
 
-1. Define a Rollout Strategy: Modify the application's deployment to use Argo Rollouts, specifying a canary release strategy in the rollout definition.
+1. **Define a Rollout Strategy: Modify the application's deployment to use Argo Rollouts, specifying a canary release strategy in the rollout definition.**
 	
 	**A canary rollout is a deployment strategy where the operator releases a new version of their application to a small percentage of the production traffic.**
 		
@@ -143,7 +148,7 @@ put username admin and password given by the above command and we are welcomed w
 		
 
     
-2. Trigger a Rollout: Make a change to the application, update the Docker image, push the new version to your registry, and update the rollout definition to use this new image.
+2. **Trigger a Rollout: Make a change to the application, update the Docker image, push the new version to your registry, and update the rollout definition to use this new image.**
 Below given is the initial state 
 
 ![[Pasted image 20240312185104.png]]
@@ -164,7 +169,7 @@ Here the rollout is paused but as the duration is not given it will be in the sa
 		
 		
     
-3. Monitor the Rollout: Use Argo Rollouts to monitor the deployment of the new version, ensuring the canary release successfully completes.
+3. **Monitor the Rollout: Use Argo Rollouts to monitor the deployment of the new version, ensuring the canary release successfully completes.**
 		There are two ways to monitor argo rollouts one is through cli by using the command
 		`kubectl argo rollouts get rollout nodejs-app-rollout --watch`
 	![[Pasted image 20240312191748.png]]
@@ -173,9 +178,57 @@ and other way is through dashboard that is accessible at https://localhost:3100
 ![[Pasted image 20240312191753.png]]
 
 ### Task 4: Cleanup
+#cleanup
 
-For ArgoCD, go to the dashboard, we can just click delete the application button. and all the resources are deleted and our cluster is cleaned.
+**For ArgoCD**, go to the dashboard, we can just click delete the application button. and all the resources are deleted and our cluster is cleaned.
+In this case resources are created in myproj namespace 
+![[Pasted image 20240312213340.png]]
+By using dashboard we confirm delete
+![[Pasted image 20240312213345.png]]
+![[Pasted image 20240312213601.png]]
 
-We clean up the cluster by following the below steps
-First we get all resources from the respective namespace
-And delete the resource by using `kubectl delete resource_name -n namespace`
+**For Rollouts**
+here we have deployed rollout in myproj namespace
+![[Pasted image 20240312215218.png]]
+
+use `kubectl delete rollouts --all -n myproj`
+and in the end for service `kubectl delete svc/node-todo -n myproj`
+
+![[Pasted image 20240312215321.png]]
+
+### But does it follow GitOps Principles ? - Yes
+#principles
+
+- [x] **Declarative** 
+(yaml, what you see in git is what you deployed)
+A system managed  by GitOps must have it's desired state expressed declaratively.
+
+- [x] **Versioned and Immutable** 
+(changes are versioned, not only about git any version solutions)
+Dersired state is stored in a way that enforces immutability, versioning and retains a complete version history..
+
+- [x] **Pulled Automatically** 
+(gitops controller actively monitors, it can be pull or push(webhooks etc) automatically updation)
+Software Agents automatically pull the desired state declarations  from the source.
+
+- [x] **Continously Reconciled** 
+(due to it provides security as one cannot change resource without declaring in git, it always trys to keep "actual system state = desired state")
+Software Agents continously observe actual system state  and attempt to apply the desired state.
+
+*source -* https://opengitops.dev/
+
+
+### Challenges
+#challenges
+
+- **Accessing ArgoCD Dashboard** - Referred documentation but didn't read carefully as there are two ways for accessing dashboard one is by changing the service type of LoadBalancer and other was Ingress method port forwarding, often while trying I opted for second one but didn't access the dashbard so I got back to fundamentals and checked the service type it was ClusterIP which is not exposed so I referred the docs and corrected the mistake.
+
+- **Kubernetes cluster** - It's about minikube I was not able to start it, it gave the virtualization error hence Iooked for alternatives like lightweight k3s and installed it on a VM and then installed argocd and accessed the dashboard.
+
+- **Rollouts** - Initially a bit tricky to interpret.
+
+###  Learning
+#learning
+
+- Documentation is good resource if read carefully.
+- Whenever there is an error get back to fundamentals of it first to understand it.
